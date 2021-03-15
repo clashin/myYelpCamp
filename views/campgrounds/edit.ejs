@@ -3,7 +3,7 @@
         <h1 class="text-center">Edit Campground</h1>
     
         <div class=" col-6 offset-md-3">
-            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="POST" class="validated-form" novalidate>
+            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="POST" class="validated-form" novalidate enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
                     <input type="text" id="title" class="form-control" placeholder="name" name="campgrounds[title]" value="<%=campground.title%>" required>
@@ -29,12 +29,20 @@
                     </div>
                 </div>
                 <div class="mb-3">
+                    <label for="formFileMultiple" class="form-label">Add more Image(s)..</label>
+                    <input class="form-control" type="file" name="image" id="formFileMultiple" multiple>
+                </div>
+                <!-- <div class="mb-3">
+                    <label for="image" class="form-label">Add Image(s)</label>
+                    <input type="file" name="image" id="image" multiple>
+                </div> -->
+                <!-- <div class="mb-3">
                     <label for="image" class="form-label">Image url</label>
                     <input type="text" class="form-control" id="image" name="campgrounds[image]" value="<%=campground.image%>" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
-                </div>
+                </div> -->
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <textarea class="form-control" id="description" name="campgrounds[description]" rows="3" required><%= campground.description%></textarea>
@@ -43,7 +51,16 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <button class="btn btn-info">Save Campground</button>
+                    <% campground.images.forEach(function(img, i) {%> 
+                        <img src="<%= img.thumbnail %> " class="img-thumbnail" alt="">
+                        <div class="form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="image-<%=i%>" name="deleteImages[]" value="<%=img.filename%>" >
+                            <label class="form-check-label" for="image-<%=i%>">Delete?</label>
+                        </div>
+                    <% }) %>
+                </div>    
+                <div class="mb-3">
+                    <button class="btn btn-info">Update Campground</button>
                 </div>
             </form>
             <footer>

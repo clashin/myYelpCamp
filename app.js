@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 const express = require('express');
 const ejsMate = require('ejs-mate');
 const path = require('path');
@@ -60,20 +64,22 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// put this before your middleware
+app.get("/favicon.ico", (req, res) => {
+    res.sendStatus(404);
+    // or instead of a 404, send an actual favicon.ico file
+    // just don't let routing continue to your middleware
+});
+
 app.use((req, res, next) => {
-    if (!['/login', '/'].includes(req.originalUrl)) {
+    if (!['/login', '/register', '/'].includes(req.originalUrl)) {
+        // console.log(req.originalUrl);
         req.session.returnTo = req.originalUrl;
     }
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
-})
-
-app.get('/fakeUser', async (req, res) => {
-    const user = new User({ email: 'gablu@gmail.com', username: 'gablu' });
-    const newUser = await User.register(user, 'monkey');
-    res.send(newUser);
 })
 
 app.use('/', userRoutes);
