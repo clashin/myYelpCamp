@@ -13,8 +13,19 @@ imageSchema.virtual('thumbnail').get(function () {
 
 const campgroundSchema = new Schema({
     title: String,
-    price: Number,
     images: [imageSchema],
+    geometry: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            required: true
+        },
+        coordinates: {
+            type: [Number],
+            required: true
+        }
+    },
+    price: Number,
     description: String,
     location: String,
     author: {
@@ -27,7 +38,7 @@ const campgroundSchema = new Schema({
             ref: 'Review'
         }
     ]
-});
+})
 
 campgroundSchema.post('findOneAndDelete', async function (doc) {
     if (doc) {
