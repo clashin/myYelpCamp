@@ -22,8 +22,12 @@ const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
+const { error } = require('console');
+const MongoStore = require('connect-mongo');
+
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
     
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -50,9 +54,24 @@ app.use(mongoSanitize({
 }));
 // app.use(express.json());
 
+const secret = process.env.SECRET || 'Thisshouldbeasecret';
+
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret
+    }
+});
+
+store.on("error", function (e) {
+    console.log("Session Store Error", e)
+});
+
 const sessionConfig = {
+    store,
     name: 'season',
-    secret: 'Thisshouldbeasecret',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -77,6 +96,7 @@ const scriptSrcUrls = [
 ];
 const styleSrcUrls = [
     "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
     "https://cdn.jsdelivr.net",
     "https://api.mapbox.com/",
     "https://api.tiles.mapbox.com/",
